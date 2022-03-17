@@ -45,15 +45,140 @@ function Map() {
   const [arr, setarr] = React.useState([])
   const [arr2, setarr2] = React.useState("kill")
   const [inst, setInst] = React.useState("")
-  const handleState = (e)=>{
+  const handleState = async (e)=>{
     setState(e.target.value);
     console.log(e.target.value);
+    const res = await axios.get(`http://127.0.0.1:5000/colleges/${e.target.value}`);
+    const block_lists = []
+    const list = []
+    if (type=== "" && block === ""){
+      res.data.map(async (i)=>{
+        const dict = {lat: i.lat, lng: i.lng, time: new Date(), name: i.institute, courses: "CS, IT, ETCE"}
+        list.push(dict);
+        if(!block_lists.includes(i.block)){
+          block_lists.push(i.block);
+        }
+      })
+      setarr(list);
+      setBlist(block_lists);
+    }
+    else if (type !== "" && block === ""){
+      res.data.map(async (i)=>{
+        if (i.status === type) {
+          const dict = {lat: i.lat, lng: i.lng, time: new Date(), name: i.institute, courses: "CS, IT, ETCE"}
+          list.push(dict);
+          if(!block_lists.includes(i.block)){
+            block_lists.push(i.block);
+          }
+        }
+      })
+      setarr(list);
+      setBlist(block_lists);
+    }
+    else if (type === "" && block !== ""){
+      res.data.map(async (i)=>{
+        if (i.block === block) {
+          const dict = {lat: i.lat, lng: i.lng, time: new Date(), name: i.institute, courses: "CS, IT, ETCE"}
+          list.push(dict);
+          if(!block_lists.includes(i.block)){
+            block_lists.push(i.block);
+          }
+        }
+      })
+      setarr(list);
+      setBlist(block_lists);
+    }
+    else {
+      res.data.map(async (i)=>{
+        if(i.block === block && i.status === type){
+          const dict = {lat: i.lat, lng: i.lng, time: new Date(), name: i.institute, courses: "CS, IT, ETCE"}
+          list.push(dict);
+          if(!block_lists.includes(i.block)){
+            block_lists.push(i.block);
+          }
+        }
+      })
+      setarr(list);
+      setBlist(block_lists);
+    }
   }
-  const handleType = (e)=>{
+  const handleType = async (e)=>{
     setType(e.target.value);
+    const res = await axios.get(`http://127.0.0.1:5000/colleges/status/${e.target.value}`);
+    const list = []
+    if (state === "" && block === ""){
+      res.data.map(async (i)=>{
+        const dict = {lat: i.lat, lng: i.lng, time: new Date(), name: i.institute, courses: "CS, IT, ETCE"}
+        list.push(dict);
+      })
+      setarr(list);
+    }
+    else if (state === "" && block !== ""){
+      res.data.map(async (i)=>{
+        if (i.block === block) {
+          const dict = {lat: i.lat, lng: i.lng, time: new Date(), name: i.institute, courses: "CS, IT, ETCE"}
+          list.push(dict);
+        }
+      })
+      setarr(list);
+    }
+    else if (state !== "" && block === ""){
+      res.data.map(async (i)=>{
+        if(i.district === state){
+          const dict = {lat: i.lat, lng: i.lng, time: new Date(), name: i.institute, courses: "CS, IT, ETCE"}
+          list.push(dict);
+        }
+      })
+      setarr(list);
+    }
+    else {
+      res.data.map(async (i)=>{
+        if (i.district === state && i.block == block){
+          const dict = {lat: i.lat, lng: i.lng, time: new Date(), name: i.institute, courses: "CS, IT, ETCE"}
+          list.push(dict);
+        }
+      })
+      setarr(list);
+    }
   }
-  const handleBlock = (e)=>{
+  const handleBlock = async (e)=>{
     setBlock(e.target.value);
+    const res = await axios.get(`http://127.0.0.1:5000/colleges/block/${e.target.value}`);
+    const list = []
+    if (state === "" && type === ""){
+      res.data.map(async (i)=>{
+        const dict = {lat: i.lat, lng: i.lng, time: new Date(), name: i.institute, courses: "CS, IT, ETCE"}
+        list.push(dict);
+      })
+      setarr(list);
+    }
+    else if (state !== "" && type === ""){
+      res.data.map(async (i)=>{
+        if(i.district === state){
+          const dict = {lat: i.lat, lng: i.lng, time: new Date(), name: i.institute, courses: "CS, IT, ETCE"}
+          list.push(dict);
+        }
+      })
+      setarr(list);
+    }
+    else if (type !== "" && state === "") {
+      res.data.map(async (i)=>{
+        if (i.status === type){
+          const dict = {lat: i.lat, lng: i.lng, time: new Date(), name: i.institute, courses: "CS, IT, ETCE"}
+          list.push(dict);
+        }
+      })
+      setarr(list);
+    }
+    else {
+      res.data.map(async (i)=>{
+        if (i.district === state && i.status == type){
+          const dict = {lat: i.lat, lng: i.lng, time: new Date(), name: i.institute, courses: "CS, IT, ETCE"}
+          list.push(dict);
+        }
+      })
+      setarr(list);
+    }
   }
   const searchfilter = async(lat, lng) => {
     console.log(lat, lng);
@@ -66,41 +191,13 @@ function Map() {
     setState(stateName.toUpperCase());
     const list = [];
     res.data.map(async (i)=>{
-      const dict = {lat: i.lat, lng: i.lng, time: new Date(), name: i.institute}
+      const dict = {lat: i.lat, lng: i.lng, time: new Date(), name: i.institute, courses: "CS, IT, ETCE"}
       list.push(dict);
     })
     setarr(list);
-  }
-  const searchSubmit = async()=>{
-    if (state !== ""){
-      const res = await axios.get(`http://127.0.0.1:5000/colleges/${state}`);
-      const list = []
-      res.data.map(async (i)=>{
-        const dict = {lat: i.lat, lng: i.lng, time: new Date(), name: i.institute}
-        list.push(dict);
-      })
-      setarr(list);
-    }
-    else if (type !== ""){
-      const res = await axios.get(`http://127.0.0.1:5000/colleges/status/${type}`);
-      console.log(res.data);
-      const list = []
-      res.data.map(async (i)=>{
-        const dict = {lat: i.lat, lng: i.lng, time: new Date(), name: i.institute}
-        list.push(dict);
-      })
-      setarr(list);
-    }
-    else if(block !== "") {
-      const res = await axios.get(`http://127.0.0.1:5000/colleges/block/${block}`);
-      console.log(res.data);
-      const list = []
-      res.data.map(async (i)=>{
-        const dict = {lat: i.lat, lng: i.lng, time: new Date(), name: i.institute}
-        list.push(dict);
-      })
-      setarr(list);
-    }
+    setState(stateName.toUpperCase());
+    setBlock("");
+    setType("");
   }
   const markers = []
   const mapref = React.useRef();
@@ -111,11 +208,13 @@ function Map() {
       const dict = {
         lat: i.lat,
         lng: i.lng,
-        name: i.institute,
+        name: i.institute, courses: "CS, IT, ETCE",
       }
       list.push(dict);
     })
     setarr(list);
+    const temp3 = await getBlock();
+    setBlist(temp3);
   }
   const onLoad = React.useCallback(async function callback(map) {
     mapref.current = map;
@@ -123,10 +222,7 @@ function Map() {
     setST(temp);
     const temp2 = await getStatus();
     setStatus(temp2);
-    const temp3 = await getBlock();
-    setBlist(temp3);
     const response = await axios.get('https://eodb.indiagis.org/eodb/gmap/fetch.distcoord?code=');
-    console.log(response.data);
     const state_data = []
     response.data.map((i)=>{
       const dict = {lat: parseFloat(i[4]), lng: parseFloat(i[3])};
@@ -136,6 +232,7 @@ function Map() {
       path: state_data,
       strokeColor: 'red',
     })
+    console.log(response.data);
     location.setMap(map);
     defLoad();
   }, [arr])
@@ -163,7 +260,7 @@ function Map() {
           <input className="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" onChange={handleData} name={data}/>
           <label className="form-check-label" for="flexSwitchCheckDefault">{data ? "Remove All" : "Show All Institutions"}</label>
         </div>
-        <button className="btn btn-primary" onClick={handleLoad}>Get All Data</button>
+        <button className="btn btn-primary w-100" onClick={handleLoad}>Get All Data</button>
         <div className="input-group my-2">
           <select className="form-select" id="inputGroupSelect04" aria-label="Example select with button addon" value={state} onChange={handleState}>
             <option defaultValue="">Choose The District</option>
@@ -194,7 +291,16 @@ function Map() {
             })}
           </select>
         </div>
-        <button className="btn btn-outline-secondary" onClick={() => searchSubmit()}>Search</button>
+        {arr.length !== 40 && data && <ul style={{listStyleType: "lower-roman"}}>
+          {arr.map((i, index) =>{
+            return (
+              <details key={index}>
+                <summary>{i.name.slice(0,1) + i.name.slice(1,24).toLowerCase()}.....</summary>
+                <p>Courses Given: {i.courses}</p>
+              </details>
+            )
+          })}
+        </ul>}
         </div>
         <h1>ITI & Polytechnique🏣</h1>
       <GoogleMap
