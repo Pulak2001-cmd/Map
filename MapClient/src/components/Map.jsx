@@ -2,6 +2,7 @@ import React from 'react';
 import { GoogleMap, MarkerClusterer, useJsApiLoader, useLoadScript, Marker, InfoWindow } from '@react-google-maps/api';
 import axios from 'axios';
 import Position from '../Positions';
+import Lat from './Lat6';
 
 
 const containerStyle = {
@@ -25,6 +26,16 @@ async function getStatus(){
 async function getBlock(){
   const response = await axios.get('http://127.0.0.1:5000/colleges/blocks');
   return response.data;
+}
+function distance(latitude1, longitude1, latitude2, longitude2) {
+  var p = 0.017453292519943295;    //This is  Math.PI / 180
+  var c = Math.cos;
+  var a = 0.5 - c((latitude2 - latitude1) * p)/2 + 
+          c(latitude1 * p) * c(latitude2 * p) * 
+          (1 - c((longitude2 - longitude1) * p))/2;
+  var R = 6371; //  Earth distance in km so it will return the distance in km
+  var dist = 2 * R * Math.asin(Math.sqrt(a)); 
+  return dist;
 }
 
 function Map() {
@@ -190,11 +201,16 @@ function Map() {
     // console.log(res.data)
     setState(stateName.toUpperCase());
     const list = [];
+    const block_lists = [];
     res.data.map(async (i)=>{
       const dict = {lat: i.lat, lng: i.lng, time: new Date(), name: i.institute, courses: "CS, IT, ETCE"}
       list.push(dict);
+      if(!block_lists.includes(i.block)){
+        block_lists.push(i.block);
+      }
     })
     setarr(list);
+    setBlist(block_lists);
     setState(stateName.toUpperCase());
     setBlock("");
     setType("");
@@ -223,17 +239,33 @@ function Map() {
     const temp2 = await getStatus();
     setStatus(temp2);
     const response = await axios.get('https://eodb.indiagis.org/eodb/gmap/fetch.distcoord?code=');
-    const state_data = []
-    response.data.map((i)=>{
-      const dict = {lat: parseFloat(i[4]), lng: parseFloat(i[3])};
-      state_data.push(dict);
-    })
-    var location = new google.maps.Polyline({
-      path: state_data,
-      strokeColor: 'red',
-    })
-    console.log(response.data);
-    location.setMap(map);
+    var x =0;
+    while(x<97474) {
+      const state_data = []
+      for(let i=x+1;i<response.data.length;i++){
+        var result = 0;
+        if(i!== 0){
+          result = (distance(response.data[i-1][4], response.data[i-1][3], response.data[i][4], response.data[i][3]));
+        }
+        if (result >= 5){
+          x = i;
+          break;
+        }
+        // console.log(result);
+        const dict = {
+          lat: parseFloat(response.data[i][4]), lng: parseFloat(response.data[i][3])
+        }
+        state_data.push(dict);
+      }
+      var location = new google.maps.Polyline({
+        path: state_data,
+        strokeColor: 'red',
+      })
+      // console.log(response.data);
+      if (data === false) {
+        location.setMap(map);
+      }
+    }
     defLoad();
   }, [arr])
   const onUnmount = React.useCallback(function callback(map) {
