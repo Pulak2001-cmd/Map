@@ -54,7 +54,6 @@ function Map() {
   const [block, setBlock] = React.useState("")
   const [data, setData] = React.useState(false)
   const [arr, setarr] = React.useState([])
-  const [arr2, setarr2] = React.useState("kill")
   const [inst, setInst] = React.useState("")
   const handleState = async (e)=>{
     setState(e.target.value);
@@ -206,7 +205,9 @@ function Map() {
       const dict = {lat: i.lat, lng: i.lng, time: new Date(), name: i.institute, courses: "CS, IT, ETCE"}
       list.push(dict);
       if(!block_lists.includes(i.block)){
-        block_lists.push(i.block);
+        if(i.block !== null){
+          block_lists.push(i.block);
+        }
       }
     })
     setarr(list);
@@ -219,6 +220,11 @@ function Map() {
   const mapref = React.useRef();
   const defLoad = async ()=>{
     const resp = await axios.get('http://127.0.0.1:5000/colleges');
+    // const payload = {
+
+    // }
+    // const resp2 = await axios.post('https://app.cpcbccr.com/caaqms/caaqms_landing_map_all');
+    // console.log(resp2.data);
     const list = []
     resp.data.map(async (i)=>{
       const dict = {
@@ -238,14 +244,15 @@ function Map() {
     setST(temp);
     const temp2 = await getStatus();
     setStatus(temp2);
-    const response = await axios.get('https://eodb.indiagis.org/eodb/gmap/fetch.distcoord?code=');
+    // const response = await axios.get('https://eodb.indiagis.org/eodb/gmap/fetch.distcoord?code=');
+    const response = Lat;
     var x =0;
     while(x<97474) {
       const state_data = []
-      for(let i=x+1;i<response.data.length;i++){
+      for(let i=x+1;i<response.length;i++){
         var result = 0;
         if(i!== 0){
-          result = (distance(response.data[i-1][4], response.data[i-1][3], response.data[i][4], response.data[i][3]));
+          result = (distance(response[i-1][4], response[i-1][3], response[i][4], response[i][3]));
         }
         if (result >= 5){
           x = i;
@@ -253,7 +260,7 @@ function Map() {
         }
         // console.log(result);
         const dict = {
-          lat: parseFloat(response.data[i][4]), lng: parseFloat(response.data[i][3])
+          lat: parseFloat(response[i][4]), lng: parseFloat(response[i][3])
         }
         state_data.push(dict);
       }
@@ -334,7 +341,7 @@ function Map() {
           })}
         </ul>}
         </div>
-        <h1>ITI & Polytechnique🏣</h1>
+        <h1>ITI & Polytechnic🏣</h1>
       <GoogleMap
         mapContainerStyle={containerStyle}
         center={center}
