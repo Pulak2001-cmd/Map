@@ -16,15 +16,15 @@ const center = {
 };
 
 async function getData(){
-  const response1 = await axios.get('http://127.0.0.1:5000/colleges/districts');
+  const response1 = await axios.get('https://dcb-node-back.herokuapp.com/colleges/districts');
   return response1.data;
 }
 async function getStatus(){
-  const response2 = await axios.get('http://127.0.0.1:5000/colleges/statuses');
+  const response2 = await axios.get('https://dcb-node-back.herokuapp.com/colleges/statuses');
   return response2.data;
 }
 async function getBlock(){
-  const response = await axios.get('http://127.0.0.1:5000/colleges/blocks');
+  const response = await axios.get('https://dcb-node-back.herokuapp.com/colleges/blocks');
   return response.data;
 }
 function distance(latitude1, longitude1, latitude2, longitude2) {
@@ -58,7 +58,7 @@ function Map() {
   const handleState = async (e)=>{
     setState(e.target.value);
     console.log(e.target.value);
-    const res = await axios.get(`http://127.0.0.1:5000/colleges/${e.target.value}`);
+    const res = await axios.get(`https://dcb-node-back.herokuapp.com/colleges/${e.target.value}`);
     const block_lists = []
     const list = []
     if (type=== "" && block === ""){
@@ -114,7 +114,7 @@ function Map() {
   }
   const handleType = async (e)=>{
     setType(e.target.value);
-    const res = await axios.get(`http://127.0.0.1:5000/colleges/status/${e.target.value}`);
+    const res = await axios.get(`https://dcb-node-back.herokuapp.com/colleges/status/${e.target.value}`);
     const list = []
     if (state === "" && block === ""){
       res.data.map(async (i)=>{
@@ -153,7 +153,7 @@ function Map() {
   }
   const handleBlock = async (e)=>{
     setBlock(e.target.value);
-    const res = await axios.get(`http://127.0.0.1:5000/colleges/block/${e.target.value}`);
+    const res = await axios.get(`https://dcb-node-back.herokuapp.com//colleges/block/${e.target.value}`);
     const list = []
     if (state === "" && type === ""){
       res.data.map(async (i)=>{
@@ -196,7 +196,7 @@ function Map() {
     setarr([]);
     // console.log(response.data.results[0].address_components);
     const stateName = response.data.results[0].address_components[2].long_name;
-    const res = await axios.get(`http://127.0.0.1:5000/colleges/${stateName.toUpperCase()}`);
+    const res = await axios.get(`https://dcb-node-back.herokuapp.com/colleges/${stateName.toUpperCase()}`);
     // console.log(res.data)
     setState(stateName.toUpperCase());
     const list = [];
@@ -219,7 +219,7 @@ function Map() {
   const markers = []
   const mapref = React.useRef();
   const defLoad = async ()=>{
-    const resp = await axios.get('http://127.0.0.1:5000/colleges');
+    const resp = await axios.get('https://dcb-node-back.herokuapp.com/colleges');
     // const payload = {
 
     // }
